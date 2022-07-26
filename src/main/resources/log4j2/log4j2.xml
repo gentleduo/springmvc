@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- status:这个用于设置log4j2自身内部的信息输出,可以不设置,当设置成trace时,会看到log4j2内部各种详细输出。 monitorInterval:Log4j能够自动检测修改配置文件和重新配置本身, 
+	设置间隔秒数。 注：本配置文件的目标是将不同级别的日志输出到不同文件，最大2MB一个文件， 文件数据达到最大值时，旧数据会被压缩并放进指定文件夹 -->
+<Configuration status="off" monitorInterval="1800">
+	<properties>
+		<!-- 配置日志文件输出目录，此配置将日志输出到tomcat根目录下的指定文件夹 -->
+		<property name="LOG_HOME">${sys:catalina.home}/logs</property>
+		<!-- 配置日志文件输出目录，此配置将日志输出到项目根目录 -->
+		<property name="LOG_ROOT">${web:rootDir}</property>
+		<!-- 配置日志文件输出目录，输出文件名 -->
+		<property name="FILE_NAME">ubs</property>
+	</properties>
+	<Appenders>
+		<!-- 优先级从高到低分别是 OFF、FATAL、ERROR、WARN、INFO、DEBUG、ALL -->
+		<!-- 单词解释： Match：匹配； DENY：拒绝 ；Mismatch：不匹配 ；ACCEPT：接受 -->
+		<!-- DENY，日志将立即被抛弃不再经过其他过滤器； NEUTRAL，有序列表里的下个过滤器过接着处理日志； ACCEPT，日志会被立即处理，不再经过剩余过滤器。 -->
+		<!--输出日志的格式 %d{yyyy-MM-dd HH:mm:ss, SSS} : 日志生产时间 %p : 日志输出格式 %c : logger的名称 
+			%m : 日志内容，即 logger.info("message") %n : 换行符 %C : Java类名 %L : 日志输出所在行数 %M 
+			: 日志输出所在方法名 hostName : 本地机器名 hostAddress : 本地ip地址 -->
+		<!-- Console节点用来定义输出到控制台的Appender name:指定Appender的名字. target:SYSTEM_OUT 
+			或 SYSTEM_ERR(在eclipse控制台上看到的是红色文字),一般只设置默认:SYSTEM_OUT. -->
+		<!--这个输出控制台的配置，这里输出WARN及以上级别的信息到System.out -->
+		<Console name="Console" target="SYSTEM_OUT">
+			<!-- 控制台只输出level及以上级别的信息(onMatch),其他的直接拒绝(onMismatch) . -->
+			<ThresholdFilter level="WARN" onMatch="ACCEPT"
+				onMismatch="DENY" />
+			<!-- 输出日志的格式 -->
+			<PatternLayout
+				pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n" />
+			<!-- <PatternLayout pattern="%5p [%t] %d{yyyy-MM-dd HH:mm:ss} (%F:%L) 
+				%m%n" /> -->
+		</Console>
+		<!-- 这个输出控制台的配置，这里输出error及以上级别的信息到System.err，在eclipse控制台上看到的是红色文字 -->
+		<!-- <Console name="console_err" target="SYSTEM_ERR"> <ThresholdFilter 
+			level="ERROR" onMatch="ACCEPT" onMismatch="DENY" /> <PatternLayout pattern="%5p 
+			[%t] %d{yyyy-MM-dd HH:mm:ss} (%F:%L) %m%n" /> </Console> -->
+		<!-- TRACE级别日志 ; 设置日志格式并配置日志压缩格式，压缩文件独立放在一个文件夹内， 日期格式不能为冒号，否则无法生成，因为文件名不允许有冒号，此appender只输出trace级别的数据到trace.log -->
+		<!-- ImmediateFlush=true，一旦有新日志写入，立马将日志写入到磁盘的文件中。当日志很多，这种频繁操作文件显然性能很低下。 
+			如果是异步日志的话应该关闭立即刷新 Log4j默认是不断的把日志内容追加到日志文件这里就有个属性append默认为true是追加的，将append设置为false的话会直接覆盖前面的内容 -->
+		<RollingFile name="trace_appender" immediateFlush="true"
+			fileName="${LOG_HOME}/trace.log" filePattern="${LOG_HOME}/trace/trace - %d{yyyy-MM-dd HH_mm}.log"
+			append="ture">
+			<PatternLayout>
+				<pattern>%5p [%t] %d{yyyy-MM-dd HH:mm:ss} (%F:%L) %m%n</pattern>
+			</PatternLayout>
+			<Policies>
+				<!-- 每个日志文件最大2MB -->
+				<SizeBasedTriggeringPolicy size="2MB" />
+			</Policies>
+			<Filters>
+				<!-- 此Filter意思是，只输出trace级别的日志信息 此Filter意思是，如果满足第一个过滤器，直接抛弃不再经过其他过滤器：例：如果日志级别是debug及以上的时候，日志将立即被抛弃不再经过其他过滤器。 
+					当第一个过滤器不满足的时候，由于onMismatch设置的是NEUTRAL，则由序列表里的下个过滤器过接着处理日志； 例：如果日志级别是trace的时候，第一个过滤器不满足要求，有序列表的下一个过滤器接着处理日志：由于第二个过滤器的onMatch设置的是ACCEPT，所以日志会被立即处理，不再经过剩余过滤器。 
+					<ThresholdFilter level="debug" onMatch="DENY" onMismatch="NEUTRAL" /> <ThresholdFilter 
+					level="trace" onMatch="ACCEPT" onMismatch="DENY" /> -->
+				<!-- 此Filter意思是，输出trace及以上级别的日志信息 -->
+				<ThresholdFilter level="trace" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+		</RollingFile>
+		<!-- DEBUG级别日志 设置日志格式并配置日志压缩格式，压缩文件独立放在一个文件夹内， 日期格式不能为冒号，否则无法生成，因为文件名不允许有冒号，此appender只输出debug级别的数据到debug.log; -->
+		<RollingFile name="debug_appender" immediateFlush="true"
+			fileName="${LOG_HOME}/debug.log" filePattern="${LOG_HOME}/debug/debug - %d{yyyy-MM-dd HH_mm}.log">
+			<PatternLayout>
+				<pattern>%5p [%t] %d{yyyy-MM-dd HH:mm:ss} (%F:%L) %m%n</pattern>
+			</PatternLayout>
+			<Policies>
+				<!-- 每个日志文件最大2MB ; -->
+				<SizeBasedTriggeringPolicy size="2MB" />
+				<!-- 如果启用此配置，则日志会按文件名生成新压缩文件， 即如果filePattern配置的日期格式为 %d{yyyy-MM-dd HH}，则每小时生成一个压缩文件， 
+					如果filePattern配置的日期格式为 %d{yyyy-MM-dd} ，则天生成一个压缩文件 -->
+				<!-- 基于时间的触发策略。该策略主要是完成周期性的log文件封存工作。有两个参数： interval，integer型，指定两次封存动作之间的时间间隔。单位:以日志的命名精度来确定单位， 
+					比如yyyy-MM-dd-HH 单位为小时，yyyy-MM-dd-HH-mm 单位为分钟 modulate，boolean型，说明是否对封存时间进行调制。若modulate=true， 
+					则封存时间将以0点为边界进行偏移计算。比如，modulate=true，interval=4hours， 那么假设上次封存日志的时间为03:00，则下次封存日志的时间为04:00， 
+					之后的封存时间依次为08:00，12:00，16:00 -->
+				<TimeBasedTriggeringPolicy interval="1"
+					modulate="true" />
+			</Policies>
+			<Filters>
+				<!-- 此Filter意思是，只输出debug级别的数据 <ThresholdFilter level="info" onMatch="DENY" 
+					onMismatch="NEUTRAL" /> <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY" 
+					/> -->
+				<!-- 此Filter意思是，输出debug及以上级别的日志信息 -->
+				<ThresholdFilter level="debug" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+		</RollingFile>
+		<!-- INFO级别日志 -->
+		<RollingFile name="info_appender" immediateFlush="true"
+			fileName="${LOG_HOME}/info.log" filePattern="${LOG_HOME}/info/info - %d{yyyy-MM-dd HH_mm}.log">
+			<PatternLayout>
+				<pattern>%5p [%t] %d{yyyy-MM-dd HH:mm:ss} (%F:%L) %m%n</pattern>
+			</PatternLayout>
+			<Policies>
+				<SizeBasedTriggeringPolicy size="2MB" />
+			</Policies>
+			<Filters>
+				<!-- 此Filter意思是，只输出info级别的数据 <ThresholdFilter level="warn" onMatch="DENY" 
+					onMismatch="NEUTRAL" /> <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" 
+					/> -->
+				<!-- 此Filter意思是，输出info及以上级别的日志信息 -->
+				<ThresholdFilter level="info" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+		</RollingFile>
+		<!-- WARN级别日志 -->
+		<RollingFile name="warn_appender" immediateFlush="true"
+			fileName="${LOG_HOME}/warn.log" filePattern="${LOG_HOME}/warn/warn - %d{yyyy-MM-dd HH_mm}.log">
+			<PatternLayout>
+				<pattern>%5p [%t] %d{yyyy-MM-dd HH:mm:ss} (%F:%L) %m%n</pattern>
+			</PatternLayout>
+			<Policies>
+				<SizeBasedTriggeringPolicy size="2MB" />
+			</Policies>
+			<Filters>
+				<!-- 此Filter意思是，只输出warn级别的数据 <ThresholdFilter level="error" onMatch="DENY" 
+					onMismatch="NEUTRAL" /> <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY" 
+					/> -->
+				<!-- 此Filter意思是，输出warn及以上级别的日志信息 -->
+				<ThresholdFilter level="warn" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+		</RollingFile>
+		<!-- ERROR级别日志 -->
+		<RollingFile name="error_appender" immediateFlush="true"
+			fileName="${LOG_HOME}/error.log" filePattern="${LOG_HOME}/error/error - %d{yyyy-MM-dd HH_mm}.log">
+			<PatternLayout>
+				<pattern>%5p [%t] %d{yyyy-MM-dd HH:mm:ss} (%F:%L) %m%n</pattern>
+			</PatternLayout>
+			<Policies>
+				<SizeBasedTriggeringPolicy size="2MB" />
+			</Policies>
+			<Filters>
+				<!-- 此Filter意思是，输出error及以上级别的信息 -->
+				<ThresholdFilter level="error" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+		</RollingFile>
+		<!-- <File name="info" fileName="${web:rootDir}/../../ubslogs/ubsinfo.log" 
+			append="true"> <Filters> <ThresholdFilter level="WARN" onMatch="DENY" onMismatch="NEUTRAL" 
+			/> <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY" /> </Filters> 
+			<PatternLayout pattern="%d{yyyy.MM.dd HH:mm:ss z} %-5level %class{36} %L 
+			%M - %msg%xEx%n" /> </File> <File name="error" fileName="${web:rootDir}/../../ubslogs/ubserror.log" 
+			append="true"> <Filters> <ThresholdFilter level="error" onMatch="ACCEPT" 
+			onMismatch="DENY" /> </Filters> <PatternLayout pattern="%d{yyyy.MM.dd HH:mm:ss 
+			z} %-5level %class{36} %L %M - %msg%xEx%n" /> </File> -->
+	</Appenders>
+	<Loggers>
+
+		<!-- 配置日志的根节点 -->
+		<!-- 定义logger，只有定义了logger并引入了appender，appender才会生效 -->
+		<!-- 如果要在日志中加上位置信息比如哪个类，第几行，需要设置 includeLocation="true" -->
+		<Root level="trace" additivity="false" includeLocation="true">
+			<!-- 这里是输入到控制台 -->
+			<AppenderRef ref="Console" />
+			<!-- <AppenderRef ref="console_err" /> -->
+			<!-- 这里是输入到文件，很重要 -->
+			<AppenderRef ref="trace_appender" />
+			<AppenderRef ref="debug_appender" />
+			<AppenderRef ref="info_appender" />
+			<AppenderRef ref="warn_appender" />
+			<AppenderRef ref="error_appender" />
+
+			<!-- <AppenderRef ref="info" /> <AppenderRef ref="error" /> -->
+		</Root>
+		<Logger name="com.gentleduo" level="info" additivity="false"
+			includeLocation="true">
+			<AppenderRef ref="info_appender" />
+		</Logger>
+		<!-- log4j2最大的特点就是异步日志，其性能的提升主要也是从异步日志中受益，我们来看看如何使用log4j2的异步日志。 Log4j2提供了两种实现日志的方式，一个是通过AsyncAppender，一个是通过AsyncLogger，分别对应前面我们说的Appender组件和Logger组件。注意这是两种不同的实现方式，在设计和源码上都是不同的体现。 -->
+		<!-- AsyncAppender是通过引用别的Appender来实现的，当有日志事件到达时，会开启另外一个线程来处理它们。需要注意的是，如果在Appender的时候出现异常，对应用来说是无法感知的。 
+			AsyncAppender应该在它引用的Appender之后配置，默认使用 java.util.concurrent.ArrayBlockingQueue实现而不需要其它外部的类库。 
+			当使用此Appender的时候，在多线程的环境下需要注意，阻塞队列容易受到锁争用的影响，这可能会对性能产生影响。这时候，我们应该考虑使用无所的异步记录器（AsyncLogger）。 -->
+		<!-- AsyncLogger方式 AsyncLogger才是log4j2 的重头戏，也是官方推荐的异步方式。它可以使得调用Logger.log返回的更快。你可以有两种选择：全局异步和混合异步。 
+			全局异步就是，所有的日志都异步的记录，在配置文件上不用做任何改动，只需要在jvm启动的时候增加一个参数； 混合异步就是，你可以在应用中同时使用同步日志和异步日志，这使得日志的配置方式更加灵活。因为Log4j文档中也说了，虽然Log4j2提供以一套异常处理机制，可以覆盖大部分的状态，但是还是会有一小部分的特殊情况是无法完全处理的，比如我们如果是记录审计日志，那么官方就推荐使用同步日志的方式，而对于其他的一些仅仅是记录一个程序日志的地方，使用异步日志将大幅提升性能，减少对应用本身的影响。混合异步的方式需要通过修改配置文件来实现，使用AsyncLogger标记配置。 -->
+		<!-- 使用Log4j日志的注意事项 不要同时使用AsyncAppender和AsyncLogger，也就是在配置中不要在配置Appender的时候，使用Async标识的同时，又配置AsyncLogger，这不会报错，但是对于性能提升没有任何好处。 
+			不要在开启了全局同步的情况下，仍然使用AsyncAppender和AsyncLogger。这和上一条是同一个意思，也就是说，如果使用异步日志，AsyncAppender、AsyncLogger和全局日志，不要同时出现。 
+			如果不是十分必须，不管是同步异步，都设置immediateFlush为false，这会对性能提升有很大帮助。 如果不是确实需要，不要打印location信息，比如HTML的location，或者pattern模式里的%C 
+			or $class, %F or %file, %l or %location, %L or %line, %M or %method, 等，因为Log4j需要在打印日志的时候做一次栈的快照才能获取这些信息，这对于性能来说是个极大的损耗。 -->
+		<!-- 同步：<Root> or <Logger> ；异步：<asyncRoot> or <asyncLogger> -->
+	</Loggers>
+</Configuration>

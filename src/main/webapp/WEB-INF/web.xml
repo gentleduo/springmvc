@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	version="2.5">
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<!-- classpath:只会到你的class路径中查找找文件;classpath*:不仅包含class路径，还包括jar文件中(class路径)进行查找。 -->
+		<param-value>classpath:spring/spring-context.xml</param-value>
+	</context-param>
+	<!--log4j配置文件地址 -->
+	<context-param>
+		<param-name>log4jConfiguration</param-name>
+		<param-value>classpath:log4j2/log4j2.xml</param-value>
+	</context-param>
+	<!-- Log4j的监听器要放在spring监听器前面 -->
+	<listener>
+		<listener-class>org.apache.logging.log4j.web.Log4jServletContextListener</listener-class>
+	</listener>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<!-- POST字符编码过滤 -->
+	<filter>
+		<description>字符集过滤器</description>
+		<filter-name>characterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<description>字符集编码</description>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>characterEncodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<filter>
+		<filter-name>log4jServletFilter</filter-name>
+		<filter-class>org.apache.logging.log4j.web.Log4jServletFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>log4jServletFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>REQUEST</dispatcher>
+		<dispatcher>FORWARD</dispatcher>
+		<dispatcher>INCLUDE</dispatcher>
+		<dispatcher>ERROR</dispatcher>
+	</filter-mapping>
+	<!-- 配置允许直接访问的资源 -->
+	<servlet-mapping>
+		<servlet-name>default</servlet-name>
+		<url-pattern>/js/**</url-pattern>
+		<url-pattern>/css/**</url-pattern>
+		<url-pattern>/gif/**</url-pattern>
+	</servlet-mapping>
+	<!-- 学习前置条件 -->
+	<!-- 问题1：web.xml中servelet、filter、listener、context-param加载顺序 -->
+	<!-- 问题2：load-on-startup标签的作用，影响了Servlet对象创建的时机 -->
+	<!-- 问题3：url-pattern:标签的配置方式有四种：/dispatcherServlet、/servlet/*、*.do、/ 以上四种配置 -->
+	<!-- 问题4：url-pattern标签的配置为什么配置/就不拦截jsp请求，而配置/*，就会拦截jsp请求 -->
+	<!-- 问题4原因：标签配置为/*报错，因为它拦截了jsp请求，但是又不能处理jsp请求。 -->
+	<!-- 问题5：配置了springmvc去读取spring配置文件之后，就产生了spring父子容器的问题 -->
+	<!-- 配置前端控制器 -->
+	<servlet>
+		<servlet-name>springmvc</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<!-- 设置spring配置文件路径 -->
+		<!-- 如果不设置初始化参数，那么DispatcherServlet会读取默认路径下的配置文件 -->
+		<!-- 默认配置文件路径：/WEB-INF/springmvc-servlet.xml -->
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>classpath:spring/spring-mvc.xml</param-value>
+		</init-param>
+		<!-- 指定初始化时机，设置为2，表示Tomcat启动时，它会跟随着启动，DispatcherServlet会跟随着初始化 -->
+		<!-- 如果没有指定初始化时机，DispatcherServlet就会在第一次被请求的时候，才会初始化，而且只会被初始化一次(单例模式) -->
+		<load-on-startup>2</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>springmvc</servlet-name>
+		<!-- url-pattern的设置 -->
+		<!-- 不要配置为/*，否则报错 -->
+		<!-- 通俗解释：会拦截整个项目中的资源访问，包含JSP和静态资源的访问,对于JS的访问，springmvc提供了默认Handler处理器 -->
+		<!-- 但是对于JSP来讲，springmvc没有提供默认的处理器，我们也没有手动编写对应的处理器，此时按照springmvc的处理流程分析得知，它down了 -->
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+	<!-- web页面异常处理： 返回jsp页面 -->
+	<!-- <error-page> <error-code>400</error-code> <location>/WEB-INF/comjsp/error404.jsp</location> 
+		</error-page> <error-page> <error-code>403</error-code> <location>/WEB-INF/comjsp/error403.jsp</location> 
+		</error-page> <error-page> <error-code>404</error-code> <location>/WEB-INF/comjsp/error404.jsp</location> 
+		</error-page> <error-page> <error-code>500</error-code> <location>/WEB-INF/comjsp/error500.jsp</location> 
+		</error-page> <error-page> <error-code>501</error-code> <location>/WEB-INF/comjsp/error500.jsp</location> 
+		</error-page> <error-page> <error-code>502</error-code> <location>/WEB-INF/comjsp/error500.jsp</location> 
+		</error-page> -->
+	<!-- web页面异常处理： 返回json数据 -->
+	<error-page>
+		<error-code>400</error-code>
+		<location>/error404</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/error403</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/error404</location>
+	</error-page>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error500</location>
+	</error-page>
+	<error-page>
+		<error-code>501</error-code>
+		<location>/error500</location>
+	</error-page>
+	<error-page>
+		<error-code>502</error-code>
+		<location>/error500</location>
+	</error-page>
+</web-app>

@@ -1,0 +1,241 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.gentleduo</groupId>
+	<artifactId>springmvc</artifactId>
+	<packaging>war</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>springmvc Maven Webapp</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<spring.version>5.2.2.RELEASE</spring.version>
+		<java.version>1.8</java.version>
+		<jdbc.driver.version>8.0.16</jdbc.driver.version>
+		<alibaba.druid>1.1.22</alibaba.druid>
+		<aopalliance.version>1.0</aopalliance.version>
+		<aspectj.version>1.9.5</aspectj.version>
+		<servlet-api.version>2.5</servlet-api.version>
+		<log4j-web.version>2.13.1</log4j-web.version>
+		<jsp-api.version>2.2.1</jsp-api.version>
+		<jstl.version>1.2</jstl.version>
+		<mybatis.version>3.5.2</mybatis.version>
+		<mybatis-spring.version>2.0.2</mybatis-spring.version>
+		<jackson.version>2.10.3</jackson.version>
+		<maven-compiler.version>3.3</maven-compiler.version>
+		<maven-war.version>3.2.3</maven-war.version>
+		<maven.test.skip>true</maven.test.skip>
+	</properties>
+
+	<dependencies>
+		<!-- spring core -->
+		<!-- 依赖注入IoC与DI的最基本实现 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<!-- Bean工厂与bean的装配 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<!-- spring的context上下文即IoC容器 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<!-- spring表达式语言 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-expression</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<!-- spring aop -->
+		<!-- 面向切面编程 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<!-- 集成AspectJ -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aspects</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<!-- 提供一些类级的工具支持和ClassLoader级的实现，用于服务器 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-instrument</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<!-- 针对tomcat的instrument实现 -->
+		<!-- <dependency> <groupId>org.springframework</groupId> <artifactId>spring-instrument-tomcat</artifactId> 
+			<version>${spring.version}</version> </dependency> -->
+		<!-- AOP依赖包 -->
+		<!-- <dependency> <groupId>aopalliance</groupId> <artifactId>aopalliance</artifactId> 
+			<version>${aopalliance.version}</version> </dependency> <dependency> <groupId>org.aspectj</groupId> 
+			<artifactId>aspectjrt</artifactId> <version>${aspectj.version}</version> 
+			</dependency> <dependency> <groupId>org.aspectj</groupId> <artifactId>aspectjweaver</artifactId> 
+			<version>${aspectj.version}</version> </dependency> -->
+
+		<!-- spring data access -->
+		<!-- jdbc的支持 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jdbc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<!-- 事务控制 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<!-- 对象关系映射，集成orm框架 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<!-- 对象xml映射 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-oxm</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<!-- java消息服务 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<!-- spring web -->
+		<!-- 基础web功能，如文件上传 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<!-- mvc实现 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<!-- 基于portlet的mvc实现 -->
+		<!-- <dependency> <groupId>org.springframework</groupId> <artifactId>spring-webmvc-portlet</artifactId> 
+			<version>${spring.version}</version> </dependency> -->
+
+		<!-- mybatis依赖 -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>${mybatis.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis-spring</artifactId>
+			<version>${mybatis-spring.version}</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.alibaba/druid -->
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+			<version>${alibaba.druid}</version>
+		</dependency>
+		<!-- 数据库依赖包 -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>${jdbc.driver.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!--Jackson核心jar包 -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<!--Jackson注解包（可选），提供注解功能 -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<!--Jackson数据绑定包（可选），提供基于“对象绑定”和“树模型”相关API。 -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<!-- spring5.0开始spring废弃了Log4jConfigListener这个类 所以web.xml 里配置的log监听Log4jConfigListener找不到类了、spring建议用log4j2 
+			来替换这个类 log4j-web会自动依赖：log4j-api和log4j-core -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-web</artifactId>
+			<version>${log4j-web.version}</version>
+		</dependency>
+
+		<!-- apache开发的一套jsp标签，后来捐赠给sun，sun命名为：jstl（jsp standard taglib ）jsp标准标签库 -->
+		<!-- jstl -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>${jstl.version}</version>
+		</dependency>
+		<!-- 通常Web容器都会自带servlet和jsp的jar包，为了避免jar包重复引起错误，需要将servlet-api和jsp-api的scope 
+			配置为provided，这样在打包项目时，就不会把它们也打包进去。项目运行时这些jar包由容器提供。 -->
+		<!-- servlet -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>${servlet-api.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- 将jsp页面转换为servlet class -->
+		<!-- jsp-api -->
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>javax.servlet.jsp-api</artifactId>
+			<version>${jsp-api.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<!-- 指定war包的名称 -->
+		<finalName>springmvc</finalName>
+		<plugins>
+			<!-- 配置Maven的JDK编译级别 -->
+			<!-- 指定maven编译的jdk版本,如果不指定,maven3默认用jdk 1.5 maven2默认用jdk1.3 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler.version}</version>
+				<configuration>
+					<source>${java.version}</source><!-- 源代码使用的JDK版本 -->
+					<target>${java.version}</target><!-- 需要生成的目标class文件的编译版本 -->
+					<encoding>UTF-8</encoding><!-- 字符集编码 -->
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>${maven-war.version}</version>
+			</plugin>
+			<!-- <plugin> <groupId>org.apache.tomcat.maven</groupId> <artifactId>tomcat7-maven-plugin</artifactId> 
+				<version>2.2</version> <configuration> <port>8080</port> </configuration> 
+				</plugin> <plugin> <groupId>org.apache.tomcat.maven</groupId> <artifactId>tomcat7-maven-plugin</artifactId> 
+				<version>2.2</version> </plugin> -->
+		</plugins>
+	</build>
+</project>
